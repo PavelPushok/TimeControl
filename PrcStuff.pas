@@ -1,0 +1,119 @@
+unit PrcStuff;
+
+interface
+
+uses Windows, SysUtils, Variants, Classes, Controls, StdCtrls, ExtCtrls,
+  Dialogs, tlhelp32, ComCtrls, QGraphics, CheckLst;
+
+function IsRunning( sName : string ) : boolean;
+procedure GetProcesses( List: TRichEdit); overload;
+procedure GetProcesses( ChLstBx: TCheckListBox ); overload;
+
+implementation
+
+procedure AddColoredLine(ARichEdit: TRichEdit; AText: string; AColor: TColor; ASize: Integer; AFont: string);
+begin
+  with ARichEdit do
+  begin
+    //SelStart := Length(ARichEdit.Text) - Length(AText);
+    SelLength := Length(AText);
+    SelAttributes.Color := AColor;
+    SelAttributes.Size := ASize;
+    SelAttributes.Name := AFont;
+    Lines.Add(AText);
+  end;
+end;
+
+
+function IsRunning( sName : string ) : boolean;
+var
+  han : THandle;
+  ProcStruct : PROCESSENTRY32; // from "tlhelp32" in uses clause
+  sID : string;
+begin
+  Result := false;
+  // Get a snapshot of the system
+  han := CreateToolhelp32Snapshot( TH32CS_SNAPALL, 0 );
+  if han = 0 then
+     exit;
+  // Loop thru the processes until we find it or hit the end
+  ProcStruct.dwSize := sizeof( PROCESSENTRY32 );
+  if Process32First( han, ProcStruct ) then
+     begin
+       repeat
+         sID := ExtractFileName( ProcStruct.szExeFile );
+         // Check only against the portion of the name supplied, ignoring case
+         if uppercase( copy( sId, 1, length( sName ) ) ) = uppercase( sName ) then
+           begin
+             // Report we found it
+             Result := true;
+             Break;
+           end;
+       until not Process32Next( han, ProcStruct );
+     end;
+  // clean-up
+  CloseHandle( han );
+end;
+
+procedure GetProcesses( List: TRichEdit );
+var
+  han : THandle;
+  ProcStruct : PROCESSENTRY32; // from "tlhelp32" in uses clause
+  sID : string;
+  pID : Integer;
+  count: integer;
+begin
+  List.Clear;
+  count:=0;
+  // Get a snapshot of the system
+  han := CreateToolhelp32Snapshot( TH32CS_SNAPALL, 0 );
+  if han = 0 then
+     exit;
+  // Loop thru the processes until we find it or hit the end
+  ProcStruct.dwSize := sizeof( PROCESSENTRY32 );
+  if Process32First( han, ProcStruct ) then
+     begin
+       repeat
+         inc(count);
+         sID := ExtractFileName( ProcStruct.szExeFile );
+         pID := ProcStruct.th32ProcessID;
+         if sID = 'taskmgr.exe' then
+          AddColoredLine(List, IntToStr(count)+ ' - ' +sID + ' pID:'+IntToStr(pID), $0F0FF0, 10, 'MS Sans Serif')
+         else
+          AddColoredLine(List, IntToStr(count)+ ' - ' +sID + ' pID:'+IntToStr(pID), $00FF00, 8, 'MS Sans Serif');
+       until not Process32Next( han, ProcStruct );
+     end;
+  // clean-up
+  CloseHandle( han );
+end;
+
+procedure GetProcesses( ChLstBx: TCheckListBox );
+var
+  han : THandle;
+  ProcStruct : PROCESSENTRY32; // from "tlhelp32" in uses clause
+  sID : string;
+  pID : Integer;
+  count: integer;
+begin
+  ChLstBx.Clear;
+  Count:=0;
+  // Get a snapshot of the system
+  han := CreateToolhelp32Snapshot( TH32CS_SNAPALL, 0 );
+  if han = 0 then
+     exit;
+  // Loop thru the processes until we find it or hit the end
+  ProcStruct.dwSize := sizeof( PROCESSENTRY32 );
+  if Process32First( han, ProcStruct ) then
+     begin
+       repeat
+         inc(count);
+         sID := ExtractFileName( ProcStruct.szExeFile );
+         pID := ProcStruct.th32ProcessID;
+         ChLstBx.Items.Add(IntToStr(count)+ ' - ' +sID + ' pID:'+IntToStr(pID));
+       until not Process32Next( han, ProcStruct );
+     end;
+  // clean-up
+  CloseHandle( han );
+end;
+
+end.
