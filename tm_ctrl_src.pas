@@ -18,8 +18,6 @@ type
     lstchnprc: TListBox;
     Label3: TLabel;
     Label4: TLabel;
-    ClientDataSet1: TClientDataSet;
-    ClientDataSet1TimeWrk: TIntegerField;
     procedure TmrMainTimer(Sender: TObject);
     procedure btnPrcClick(Sender: TObject);
     procedure chklstprcClickCheck(Sender: TObject);

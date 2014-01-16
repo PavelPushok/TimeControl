@@ -87,5 +87,8 @@ object FrmMain: TFrmMain
     Params = <>
     Left = 8
     Top = 80
+    object ClientDataSet1TimeWrk: TIntegerField
+      FieldName = 'TimeWrk'
+    end
   end
 end

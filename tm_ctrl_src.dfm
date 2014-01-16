@@ -82,13 +82,4 @@ object FrmMain: TFrmMain
     Left = 64
     Top = 8
   end
-  object ClientDataSet1: TClientDataSet
-    Aggregates = <>
-    Params = <>
-    Left = 8
-    Top = 80
-    object ClientDataSet1TimeWrk: TIntegerField
-      FieldName = 'TimeWrk'
-    end
-  end
 end
